@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Shortcode Meta class.
  *
@@ -6,41 +7,45 @@
  */
 
 // Do not allow directly accessing this file.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit( 'This script cannot be accessed directly.' );
+if (!defined('ABSPATH')) {
+	exit('This script cannot be accessed directly.');
 }
 
-if ( ! class_exists( 'TLPPortfolioSCMeta' ) ) :
+if (!class_exists('TLPPortfolioSCMeta')) :
 	/**
 	 * Shortcode Meta class.
 	 */
-	class TLPPortfolioSCMeta {
-		public function __construct() {
-			add_action( 'add_meta_boxes', [ $this, 'tlp_portfolio_sc_meta_boxes' ] );
-			add_action( 'save_post', [ $this, 'save_tlp_portfolio_sc_meta_data' ], 10, 2 );
-			add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts_sc' ] );
-			add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts_settings' ] );
-			add_action( 'edit_form_after_title', [ $this, 'portfolio_sc_after_title' ] );
-			add_action( 'admin_init', [ $this, 'remove_all_meta_box' ] );
+	class TLPPortfolioSCMeta
+	{
+		public function __construct()
+		{
+			add_action('add_meta_boxes', [$this, 'tlp_portfolio_sc_meta_boxes']);
+			add_action('save_post', [$this, 'save_tlp_portfolio_sc_meta_data'], 10, 2);
+			add_action('admin_enqueue_scripts', [$this, 'admin_enqueue_scripts_sc']);
+			add_action('admin_enqueue_scripts', [$this, 'admin_enqueue_scripts_settings']);
+			add_action('edit_form_after_title', [$this, 'portfolio_sc_after_title']);
+			add_action('admin_init', [$this, 'remove_all_meta_box']);
 		}
 
-		public function remove_all_meta_box() {
-			if ( is_admin() ) {
+		public function remove_all_meta_box()
+		{
+			if (is_admin()) {
 				add_filter(
 					'get_user_option_meta-box-order_{TLPPortfolio()->shortCodePT}',
-					[ $this, 'remove_all_meta_boxes_portfolio_sc' ]
+					[$this, 'remove_all_meta_boxes_portfolio_sc']
 				);
 			}
 		}
 
-		public function remove_all_meta_boxes_portfolio_sc() {
+		public function remove_all_meta_boxes_portfolio_sc()
+		{
 			global $wp_meta_boxes;
 
-			$publishBox   = $wp_meta_boxes[ TLPPortfolio()->getScPostType() ]['side']['core']['submitdiv'];
-			$scBox        = $wp_meta_boxes[ TLPPortfolio()->getScPostType() ]['normal']['high']['pfp_sc_settings_meta'];
-			$scPreviewBox = $wp_meta_boxes[ TLPPortfolio()->getScPostType() ]['normal']['high']['pfp_sc_preview_meta'];
-			$wp_meta_boxes[ TLPPortfolio()->getScPostType() ] = [
-				'side'   => [ 'core' => [ 'submitdiv' => $publishBox ] ],
+			$publishBox   = $wp_meta_boxes[TLPPortfolio()->getScPostType()]['side']['core']['submitdiv'];
+			$scBox        = $wp_meta_boxes[TLPPortfolio()->getScPostType()]['normal']['high']['pfp_sc_settings_meta'];
+			$scPreviewBox = $wp_meta_boxes[TLPPortfolio()->getScPostType()]['normal']['high']['pfp_sc_preview_meta'];
+			$wp_meta_boxes[TLPPortfolio()->getScPostType()] = [
+				'side'   => ['core' => ['submitdiv' => $publishBox]],
 				'normal' => [
 					'high' => [
 						'pfp_sc_settings_meta' => $scBox,
@@ -52,16 +57,17 @@ if ( ! class_exists( 'TLPPortfolioSCMeta' ) ) :
 			return [];
 		}
 
-		public function portfolio_sc_after_title( $post ) {
-			if ( TLPPortfolio()->getScPostType() !== $post->post_type ) {
+		public function portfolio_sc_after_title($post)
+		{
+			if (TLPPortfolio()->getScPostType() !== $post->post_type) {
 				return;
 			}
-			?>
+?>
 			<div class="postbox" style="margin-bottom: 0;">
 				<div class="inside">
 					<p>
-						<input type="text" onfocus="this.select();" readonly="readonly" value="[tlpportfolio id=&quot;<?php echo absint( $post->ID ); ?>&quot; title=&quot;<?php echo esc_attr( $post->post_title ); ?>&quot;]" class="large-text code tlp-code-sc">
-						<input type="text" onfocus="this.select();" readonly="readonly" value="&#60;&#63;php echo do_shortcode( &#39;[tlpportfolio id=&quot;<?php echo absint( $post->ID ); ?>&quot; title=&quot;<?php echo esc_attr( $post->post_title ); ?>&quot;]&#39; ) &#63;&#62;" class="large-text code tlp-code-sc">
+						<input type="text" onfocus="this.select();" readonly="readonly" value="[tlpportfolio id=&quot;<?php echo absint($post->ID); ?>&quot; title=&quot;<?php echo esc_attr($post->post_title); ?>&quot;]" class="large-text code tlp-code-sc">
+						<input type="text" onfocus="this.select();" readonly="readonly" value="&#60;&#63;php echo do_shortcode( &#39;[tlpportfolio id=&quot;<?php echo absint($post->ID); ?>&quot; title=&quot;<?php echo esc_attr($post->post_title); ?>&quot;]&#39; ) &#63;&#62;" class="large-text code tlp-code-sc">
 					</p>
 				</div>
 			</div>
@@ -69,11 +75,12 @@ if ( ! class_exists( 'TLPPortfolioSCMeta' ) ) :
 			<?php
 		}
 
-		public function tlp_portfolio_sc_meta_boxes() {
+		public function tlp_portfolio_sc_meta_boxes()
+		{
 			add_meta_box(
 				'tlp_portfolio_sc_settings_meta',
-				esc_html__( 'Short Code Generator', 'tlp-portfolio' ),
-				[ $this, 'tlp_portfolio_sc_settings_selection' ],
+				esc_html__('Short Code Generator', 'tlp-portfolio'),
+				[$this, 'tlp_portfolio_sc_settings_selection'],
 				TLPPortfolio()->getScPostType(),
 				'normal',
 				'high'
@@ -81,38 +88,39 @@ if ( ! class_exists( 'TLPPortfolioSCMeta' ) ) :
 
 			add_meta_box(
 				'pfp_sc_preview_meta',
-				esc_html__( 'Layout Preview', 'tlp-portfolio' ),
-				[ $this, 'pfp_sc_preview_selection' ],
+				esc_html__('Layout Preview', 'tlp-portfolio'),
+				[$this, 'pfp_sc_preview_selection'],
 				TLPPortfolio()->getScPostType(),
 				'normal',
 				'high'
 			);
 			add_meta_box(
 				'rt_plugin_portfolio_sc_pro_information',
-				esc_html__( 'Pro Documentation', 'tlp-portfolio' ),
-				[ $this, 'rt_plugin_portfolio_sc_pro_information' ],
+				esc_html__('Pro Documentation', 'tlp-portfolio'),
+				[$this, 'rt_plugin_portfolio_sc_pro_information'],
 				TLPPortfolio()->getScPostType(),
 				'side'
 			);
 		}
 
-		public function rt_plugin_portfolio_sc_pro_information( $post ) {
+		public function rt_plugin_portfolio_sc_pro_information($post)
+		{
 			$doc     = 'https://radiustheme.com/how-to-setup-and-configure-tlp-portfolio-free-version-for-wordpress/';
 			$contact = 'https://www.radiustheme.com/contact/';
 			$fb      = 'https://www.facebook.com/groups/234799147426640/';
 			$rt      = 'https://www.radiustheme.com/';
-			if ( $post === 'settings' ) {
-				?>
+			if ($post === 'settings') {
+			?>
 				<div class="rt-document-box rt-update-pro-btn-wrap">
-					<a href="<?php echo esc_url( TLPPortfolio()->pro_version_link() ); ?>" target="_blank" class="rt-update-pro-btn">Update Pro To Get More Features</a>
+					<a href="<?php echo esc_url(TLPPortfolio()->pro_version_link()); ?>" target="_blank" class="rt-update-pro-btn">Update Pro To Get More Features</a>
 				</div>
 			<?php } ?>
 			<div class="rt-document-box">
 				<div class="rt-box-icon"><i class="dashicons dashicons-media-document"></i></div>
 				<div class="rt-box-content">
 					<h3 class="rt-box-title">Documentation</h3>
-						<p>Get started by spending some time with the documentation we included step by step process with screenshots with video.</p>
-						<a href="<?php echo esc_url( $doc ); ?>" target="_blank" class="rt-admin-btn">Documentation</a>
+					<p>Get started by spending some time with the documentation we included step by step process with screenshots with video.</p>
+					<a href="<?php echo esc_url($doc); ?>" target="_blank" class="rt-admin-btn">Documentation</a>
 				</div>
 			</div>
 
@@ -121,129 +129,134 @@ if ( ! class_exists( 'TLPPortfolioSCMeta' ) ) :
 				<div class="rt-box-content">
 					<h3 class="rt-box-title">Need Help?</h3>
 					<p>Stuck with something? Please create a
-					<a href="<?php echo esc_url( $contact ); ?>">ticket here</a> or post on <a href="<?php echo esc_url( $fb ); ?>">facebook group</a>. For emergency case join our <a href="<?php echo esc_url( $rt ); ?>">live chat</a>.</p>
-					<a href="<?php echo esc_url( $contact ); ?>" target="_blank" class="rt-admin-btn">Get Support</a>
+						<a href="<?php echo esc_url($contact); ?>">ticket here</a> or post on <a href="<?php echo esc_url($fb); ?>">facebook group</a>. For emergency case join our <a href="<?php echo esc_url($rt); ?>">live chat</a>.
+					</p>
+					<a href="<?php echo esc_url($contact); ?>" target="_blank" class="rt-admin-btn">Get Support</a>
 				</div>
 			</div>
-			<?php if ( $post !== 'settings' ) { ?>
+			<?php if ($post !== 'settings') { ?>
 				<div class="rt-document-box rt-update-pro-btn-wrap">
-					<a href="<?php echo esc_url( TLPPortfolio()->pro_version_link() ); ?>" target="_blank" class="rt-update-pro-btn">Update Pro To Get More Features</a>
+					<a href="<?php echo esc_url(TLPPortfolio()->pro_version_link()); ?>" target="_blank" class="rt-update-pro-btn">Update Pro To Get More Features</a>
 				</div>
 			<?php } ?>
 
-			<?php
+		<?php
 
 		}
 
-		public function tlp_portfolio_sc_settings_selection() {
-			wp_nonce_field( TLPPortfolio()->nonceText(), TLPPortfolio()->nonceId() );
+		public function tlp_portfolio_sc_settings_selection()
+		{
+			wp_nonce_field(TLPPortfolio()->nonceText(), TLPPortfolio()->nonceId());
 
-			?>
+		?>
 			<div id="sc-tabs" class="rt-tabs rt-tab-container">
 				<ul class="tab-nav rt-tab-nav">
 					<li class="active">
 						<a href="#sc-layout-settings">
 							<i class="dashicons dashicons-layout"></i>
-							<?php esc_html_e( 'Layout', 'tlp-portfolio' ); ?>
+							<?php esc_html_e('Layout', 'tlp-portfolio'); ?>
 						</a>
 					</li>
 					<li>
 						<a href="#sc-filtering">
 							<i class="dashicons dashicons-filter"></i>
-							<?php esc_html_e( 'Filtering', 'tlp-portfolio' ); ?>
+							<?php esc_html_e('Filtering', 'tlp-portfolio'); ?>
 						</a>
 					</li>
 					<li>
 						<a href="#sc-field-selection">
-							<i class="dashicons dashicons-editor-table"></i> <?php esc_html_e( 'Field Selection', 'tlp-portfolio' ); ?>
+							<i class="dashicons dashicons-editor-table"></i> <?php esc_html_e('Field Selection', 'tlp-portfolio'); ?>
 						</a>
 					</li>
 					<li>
 						<a href="#sc-style">
 							<i class="dashicons dashicons-admin-customizer"></i>
-							<?php esc_html_e( 'Styling', 'tlp-portfolio' ); ?>
+							<?php esc_html_e('Styling', 'tlp-portfolio'); ?>
 						</a>
 					</li>
 				</ul>
 
 				<div id="sc-layout-settings" class="rt-tab-content" style="display: block">
 					<div class="tab-content">
-						<?php TLPPortfolio()->print_html( TLPPortfolio()->rtFieldGenerator( TLPPortfolio()->scLayoutMetaFields() ), true ); ?>
+						<?php TLPPortfolio()->print_html(TLPPortfolio()->rtFieldGenerator(TLPPortfolio()->scLayoutMetaFields()), true); ?>
 					</div>
 				</div>
 
 				<div id="sc-filtering" class="rt-tab-content">
 					<div class="tab-content">
-						<?php TLPPortfolio()->print_html( TLPPortfolio()->rtFieldGenerator( TLPPortfolio()->scFilterMetaFields() ), true ); ?>
+						<?php TLPPortfolio()->print_html(TLPPortfolio()->rtFieldGenerator(TLPPortfolio()->scFilterMetaFields()), true); ?>
 					</div>
 				</div>
 
 				<div id="sc-field-selection" class="rt-tab-content">
 					<div class="tab-content">
-						<?php TLPPortfolio()->print_html( TLPPortfolio()->rtFieldGenerator( TLPPortfolio()->scItemMetaFields() ), true ); ?>
+						<?php TLPPortfolio()->print_html(TLPPortfolio()->rtFieldGenerator(TLPPortfolio()->scItemMetaFields()), true); ?>
 					</div>
 				</div>
 
 				<div id="sc-style" class="rt-tab-content">
 					<div class="tab-content">
-						<?php TLPPortfolio()->print_html( TLPPortfolio()->rtFieldGenerator( TLPPortfolio()->scStyleFields() ), true ); ?>
+						<?php TLPPortfolio()->print_html(TLPPortfolio()->rtFieldGenerator(TLPPortfolio()->scStyleFields()), true); ?>
 					</div>
 				</div>
 			</div>
-			<?php
+		<?php
 		}
 
-		public function pfp_sc_preview_selection() {
-			?>
+		public function pfp_sc_preview_selection()
+		{
+		?>
 			<div id='pfp-response'>
 				<span class='spinner'></span>
 			</div>
 			<div id='pfp-preview-container'></div>
-			<?php
+<?php
 		}
 
-		public function save_tlp_portfolio_sc_meta_data( $post_id, $post ) {
-			if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		public function save_tlp_portfolio_sc_meta_data($post_id, $post)
+		{
+			if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
 				return;
 			}
 
-			if ( ! TLPPortfolio()->verifyNonce() ) {
+			if (!TLPPortfolio()->verifyNonce()) {
 				return $post_id;
 			}
 
-			if ( TLPPortfolio()->getScPostType() != $post->post_type ) {
+			if (TLPPortfolio()->getScPostType() != $post->post_type) {
 				return $post_id;
 			}
 
 			$mates = TLPPortfolio()->pfpScMetaFields();
 
-			foreach ( $mates as $metaKey => $field ) {
-				$rValue = ! empty( $_REQUEST[ $metaKey ] ) ? $_REQUEST[ $metaKey ] : null;
-				$value  = TLPPortfolio()->sanitize( $field, $rValue );
+			foreach ($mates as $metaKey => $field) {
+				$rValue = !empty($_REQUEST[$metaKey]) ? $_REQUEST[$metaKey] : null;
+				$value  = TLPPortfolio()->sanitize($field, $rValue);
 
-				if ( empty( $field['multiple'] ) ) {
-					update_post_meta( $post_id, $metaKey, $value );
+				if (empty($field['multiple'])) {
+					update_post_meta($post_id, $metaKey, $value);
 				} else {
-					delete_post_meta( $post_id, $metaKey );
+					delete_post_meta($post_id, $metaKey);
 
-					if ( is_array( $value ) && ! empty( $value ) ) {
-						foreach ( $value as $item ) {
-							add_post_meta( $post_id, $metaKey, $item );
+					if (is_array($value) && !empty($value)) {
+						foreach ($value as $item) {
+							add_post_meta($post_id, $metaKey, $item);
 						}
 					} else {
-						update_post_meta( $post_id, $metaKey, '' );
+						update_post_meta($post_id, $metaKey, '');
 					}
 				}
 			}
 
-			$this->generatorShortCodeCss( $post_id );
+			$this->generatorShortCodeCss($post_id);
 		}
 
-		public function generatorShortCodeCss( $scID ) {
+		public function generatorShortCodeCss($scID)
+		{
 			global $wp_filesystem;
 
 			// Initialize the WP filesystem, no more using 'file-put-contents' function.
-			if ( empty( $wp_filesystem ) ) {
+			if (empty($wp_filesystem)) {
 				require_once ABSPATH . '/wp-admin/includes/file.php';
 				WP_Filesystem();
 			}
@@ -252,47 +265,49 @@ if ( ! class_exists( 'TLPPortfolioSCMeta' ) ) :
 			$upload_basedir = $upload_dir['basedir'];
 			$cssFile        = $upload_basedir . '/tlp-portfolio/portfolio-sc.css';
 
-			if ( $css = TLPPortfolio()->render( 'portfolio-sc-css', compact( 'scID' ), true ) ) {
-				$css = sprintf( '/*sc-%2$d-start*/%1$s/*sc-%2$d-end*/', $css, $scID );
+			if ($css = TLPPortfolio()->render('portfolio-sc-css', compact('scID'), true)) {
+				$css = sprintf('/*sc-%2$d-start*/%1$s/*sc-%2$d-end*/', $css, $scID);
 
-				if ( file_exists( $cssFile ) && ( $oldCss = $wp_filesystem->get_contents( $cssFile ) ) ) {
-					if ( strpos( $oldCss, '/*sc-' . $scID . '-start' ) !== false ) {
-						$oldCss = preg_replace( '/\/\*sc-' . $scID . '-start[\s\S]+?sc-' . $scID . '-end\*\//', '', $oldCss );
-						$oldCss = preg_replace( "/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", '', $oldCss );
+				if (file_exists($cssFile) && ($oldCss = $wp_filesystem->get_contents($cssFile))) {
+					if (strpos($oldCss, '/*sc-' . $scID . '-start') !== false) {
+						$oldCss = preg_replace('/\/\*sc-' . $scID . '-start[\s\S]+?sc-' . $scID . '-end\*\//', '', $oldCss);
+						$oldCss = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", '', $oldCss);
 					}
 
 					$css = $oldCss . $css;
-				} elseif ( ! file_exists( $cssFile ) ) {
-					$upload_basedir_trailingslashit = trailingslashit( $upload_basedir );
-					$wp_filesystem->mkdir( $upload_basedir_trailingslashit . 'tlp-portfolio' );
+				} elseif (!file_exists($cssFile)) {
+					$upload_basedir_trailingslashit = trailingslashit($upload_basedir);
+					$wp_filesystem->mkdir($upload_basedir_trailingslashit . 'tlp-portfolio');
 				}
 
-				if ( ! $wp_filesystem->put_contents( $cssFile, $css ) ) {
-					error_log( print_r( 'Error Generated css file ', true ) );
+				if (!$wp_filesystem->put_contents($cssFile, $css)) {
+					error_log(print_r('Error Generated css file ', true));
 				}
 			}
 		}
 
-		public function admin_enqueue_scripts_settings() {
+		public function admin_enqueue_scripts_settings()
+		{
 			global $typenow;
 
-			if ( $typenow != TLPPortfolio()->post_type || ! isset( $_GET['page'] ) || $_GET['page'] !== 'tlp_portfolio_settings' ) {
+			if ($typenow != TLPPortfolio()->post_type || !isset($_GET['page']) || $_GET['page'] !== 'tlp_portfolio_settings') {
 				return;
 			}
 
-			wp_enqueue_script( [ 'wp-color-picker', 'tlp-portfolio-admin' ] );
-			wp_enqueue_style( [ 'tlp-portfolio-admin', 'wp-color-picker' ] );
+			wp_enqueue_script(['wp-color-picker', 'tlp-portfolio-admin']);
+			wp_enqueue_style(['tlp-portfolio-admin', 'wp-color-picker']);
 		}
 
-		public function admin_enqueue_scripts_sc() {
+		public function admin_enqueue_scripts_sc()
+		{
 			global $pagenow, $typenow;
 
 			// validate page.
-			if ( ! in_array( $pagenow, [ 'post.php', 'post-new.php', 'edit.php' ] ) ) {
+			if (!in_array($pagenow, ['post.php', 'post-new.php', 'edit.php'])) {
 				return;
 			}
 
-			if ( $typenow != TLPPortfolio()->getScPostType() ) {
+			if ($typenow != TLPPortfolio()->getScPostType()) {
 				return;
 			}
 

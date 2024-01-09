@@ -9,3 +9,19 @@ Version: 1.0
 Text Domain: portefolio
 Tags: developpement front-end et back-end, developpement wordpress
 */
+body{
+    margin: 0 auto;
+    font-family: 'Poppins', sans-serif !important;
+}
+#masthead {
+    position: sticky !important;
+    top: 0;
+  }
+  
+  .elementor-widget-container a:visited {
+    font-weight: 400 !important;
+  }
+  .elementor-widget-container a:hover {
+    font-weight: 500;
+  }
+  
